@@ -37,4 +37,6 @@ out/
 .vscode/
 
 ### properties ###
+*.sql
+*.yml
 *.properties
