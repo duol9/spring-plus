@@ -60,10 +60,17 @@ public class TodoService {
 
 
     @Transactional(readOnly = true)
-    public Page<TodoResponse> getTodos(int page, int size) {
+    public Page<TodoResponse> getTodos(int page, int size, TodosGetRequest todosGetRequest) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        Page<Todo> todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
+        LocalDateTime startDay = todosGetRequest.getStartDay() != null ? todosGetRequest.getStartDay().atStartOfDay() : null;
+        LocalDateTime endDay = todosGetRequest.getEndDay() != null ? todosGetRequest.getEndDay().plusDays(1).atStartOfDay() : null;
+
+        Page<Todo> todos = todoRepository.findAllByConditions(
+            todosGetRequest.getWeather(),
+            startDay,
+            endDay,
+            pageable);
 
         return todos.map(todo -> new TodoResponse(
                 todo.getId(),
