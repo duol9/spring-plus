@@ -10,6 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.example.expert.domain.common.dto.AuthUser;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.example.expert.domain.user.enums.UserRole;
 
 import java.io.IOException;
@@ -55,13 +59,18 @@ public class JwtFilter implements Filter {
                 return;
             }
 
+            Long userId = Long.parseLong(claims.getSubject());
+            String email = claims.get("email", String.class);
+            String nickname = claims.get("nickname", String.class);
             UserRole userRole = UserRole.valueOf(claims.get("userRole", String.class));
 
-            httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
-            httpRequest.setAttribute("email", claims.get("email"));
-            httpRequest.setAttribute("userRole", claims.get("userRole"));
+            AuthUser authUser = new AuthUser(userId, email, nickname, userRole);
 
-            if (url.startsWith("/admin")) {
+            // 인증 정보 설정 관리
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities()));
+
+            // SecurityConfig에서 처리됨
+            /*if (url.startsWith("/admin")) {
                 // 관리자 권한이 없는 경우 403을 반환합니다.
                 if (!UserRole.ADMIN.equals(userRole)) {
                     httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "관리자 권한이 없습니다.");
@@ -69,7 +78,7 @@ public class JwtFilter implements Filter {
                 }
                 chain.doFilter(request, response);
                 return;
-            }
+            }*/
 
             chain.doFilter(request, response);
         } catch (SecurityException | MalformedJwtException e) {
