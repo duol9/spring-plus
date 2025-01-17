@@ -35,6 +35,9 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
 
+    // spring security
+    implementation 'org.springframework.boot:spring-boot-starter-security'  // 시큐리티 필터 체인이 생긴다
+
     // bcrypt
     implementation 'at.favre.lib:bcrypt:0.10.2'
 
