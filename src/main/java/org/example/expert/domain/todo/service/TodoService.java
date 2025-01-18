@@ -23,13 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-
-// 트랜잭셔널 없앤 이유 - (나중에 커밋할 때 메시지에 쓸거임)
-// @Transactional(readOnly = true) 해당 어노테이션의 의미는 읽기만 가능하다는 뜻으로. db 변화를 허용하지 않았음
-// saveTodo는 db에 변화를 주는 동작을 하는 메서드로 readOnly에 걸리게 되어 오류가 발생했던 것
-// 또한 클래스 전체에 @Transactional을 하는 것보단 각각의 메서드에 해주는 것이 좋다. 메서드마다 동작이 다르기 때문
-// 결론적으로 조회하는 메서드인 getTodo, getTodos에는 @Transactional(readOnly = true)을 해주고,
-// saveTodo에는 @Transactional(readOnly = false)로 변경해 읽기 전용을 비활성화했다.
+@Transactional(readOnly = true)
 public class TodoService {
 
     private final TodoRepository todoRepository;
@@ -58,8 +52,6 @@ public class TodoService {
         );
     }
 
-
-    @Transactional(readOnly = true)
     public Page<TodoResponse> getTodos(int page, int size, TodosGetRequest todosGetRequest) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -83,7 +75,6 @@ public class TodoService {
         ));
     }
 
-    @Transactional(readOnly = true)
     public TodoResponse getTodo(long todoId) {
         Todo todo = todoRepository.findByIdWithUser(todoId)
                 .orElseThrow(() -> new InvalidRequestException("Todo not found"));
