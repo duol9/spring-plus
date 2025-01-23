@@ -30,6 +30,7 @@ public class SecurityConfig {
 				.requestMatchers("/auth/**").permitAll() // /auth로 시작하는건 다 허용
 				.requestMatchers("/admin/**").hasRole("ADMIN")
 				.requestMatchers("/users/**").hasRole("USER")
+				.requestMatchers("/health").permitAll()
 				.anyRequest().authenticated()
 			)
 			.build();

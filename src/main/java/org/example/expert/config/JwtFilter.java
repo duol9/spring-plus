@@ -17,11 +17,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.example.expert.domain.user.enums.UserRole;
 
 import java.io.IOException;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtFilter implements Filter {
 
+    private static final Set<String> whiteList = Set.of("/auth", "/health", "/actuator/health");
     private final JwtUtil jwtUtil;
 
     @Override
@@ -36,7 +38,7 @@ public class JwtFilter implements Filter {
 
         String url = httpRequest.getRequestURI();
 
-        if (url.startsWith("/auth")) {
+        if (isWhiteList(url)) {
             chain.doFilter(request, response);
             return;
         }
@@ -63,7 +65,6 @@ public class JwtFilter implements Filter {
             String email = claims.get("email", String.class);
             String nickname = claims.get("nickname", String.class);
             UserRole userRole = UserRole.valueOf(claims.get("userRole", String.class));
-
             AuthUser authUser = new AuthUser(userId, email, nickname, userRole);
 
             // 인증 정보 설정 관리
@@ -99,5 +100,9 @@ public class JwtFilter implements Filter {
     @Override
     public void destroy() {
         Filter.super.destroy();
+    }
+
+    private boolean isWhiteList(String url) {
+        return whiteList.contains(url);
     }
 }
