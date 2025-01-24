@@ -23,7 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class JwtFilter implements Filter {
 
-    private static final Set<String> whiteList = Set.of("/auth", "/health", "/actuator/health");
+    private static final Set<String> whiteList = Set.of("/auth/signup", "/auth/signin", "/health", "/actuator/health");
     private final JwtUtil jwtUtil;
 
     @Override
